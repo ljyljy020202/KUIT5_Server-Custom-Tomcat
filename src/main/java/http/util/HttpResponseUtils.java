@@ -12,10 +12,10 @@ public class HttpResponseUtils {
     private static final Logger log = Logger.getLogger(HttpResponseUtils.class.getName());
     private static final String WEB_ROOT = "webapp";
 
-    public static void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    public static void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) throws IOException {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: text/" + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
@@ -46,14 +46,18 @@ public class HttpResponseUtils {
     }
 
     public static void serveFile(DataOutputStream dos, String filePath) {
+        String contentType = "html";
         if(filePath.equals("/")) {
             filePath = "/index.html";
+        }
+        if(filePath.endsWith("css")){
+            contentType = "css";
         }
         try {
             Path path = Paths.get(WEB_ROOT, filePath);
             if (Files.exists(path) && !Files.isDirectory(path)) {
                 byte[] body = Files.readAllBytes(path);
-                response200Header(dos, body.length);
+                response200Header(dos, body.length, contentType);
                 responseBody(dos, body);
             } else {
                 //response404(dos);
