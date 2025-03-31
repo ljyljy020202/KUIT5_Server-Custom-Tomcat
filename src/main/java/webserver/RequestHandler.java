@@ -33,6 +33,17 @@ public class RequestHandler implements Runnable{
             if(line != null)
                 handleRequest(line, br, dos);
 
+            /*
+            String line;
+            while ((line = br.readLine()) != null) {
+                log.info("Request: " + line);
+
+                if (!line.isEmpty()) { // 빈 줄이 아닐 때만 처리
+                    handleRequest(line, br, dos);
+                }
+            }
+            */
+
         } catch (IOException | URISyntaxException e) {
             log.log(Level.SEVERE,e.getMessage());
         }
@@ -51,14 +62,17 @@ public class RequestHandler implements Runnable{
             }else {
                 HashMap<String, String> map = (HashMap<String, String>) HttpRequestUtils.parseQueryParameter(query);
                 if(path.equals("/user/signup")){
-                    HandleSignUp.handle(br, dos, map);
+                    HandleSignUp.handleGet(dos, map);
                 }else if(path.equals("/user/login")){
-                    HandleLogIn.handle(br, dos, map);
+                    HandleLogIn.handle(dos, map);
                 }
             }
 
         }else if(tokens[0].equals("POST")) {
 
+            if(tokens[1].equals("/user/signup")){
+                HandleSignUp.handlePost(dos);
+            }
         }
     }
 }

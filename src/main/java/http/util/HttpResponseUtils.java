@@ -23,10 +23,13 @@ public class HttpResponseUtils {
         }
     }
 
-    public static void response302Redirect(DataOutputStream dos, String redirectUrl) {
+    public static void response302Redirect(DataOutputStream dos, String redirectUrl, boolean logined) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found\r\n");
             dos.writeBytes("Location: " + redirectUrl + "\r\n");
+            if(logined) {
+                dos.writeBytes("Cookie: logined=true\r\n");
+            }
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage());
