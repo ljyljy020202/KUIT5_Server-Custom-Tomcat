@@ -23,6 +23,16 @@ public class HttpResponseUtils {
         }
     }
 
+    public static void response302Redirect(DataOutputStream dos, String redirectUrl) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found\r\n");
+            dos.writeBytes("Location: " + redirectUrl + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.log(Level.SEVERE, e.getMessage());
+        }
+    }
+
     public static void responseBody(DataOutputStream dos, byte[] body) {
         try {
             dos.write(body, 0, body.length);
