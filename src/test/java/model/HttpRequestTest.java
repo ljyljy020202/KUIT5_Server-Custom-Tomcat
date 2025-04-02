@@ -1,6 +1,5 @@
-package http.util;
+package model;
 
-import model.HttpRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
