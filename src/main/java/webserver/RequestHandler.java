@@ -2,7 +2,8 @@ package webserver;
 
 import http.util.HttpRequestUtils;
 import http.util.HttpResponseUtils;
-import http.util.IOUtils;
+import model.HttpRequest;
+import model.HttpResponse;
 
 import java.io.*;
 import java.net.Socket;
@@ -33,24 +34,10 @@ public class RequestHandler implements Runnable{
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             DataOutputStream dos = new DataOutputStream(out);
 
-            // 요청 메세지 읽기
-            String requestLine = br.readLine();
-            log.info("Request: " + requestLine);
+            HttpRequest httpRequest = HttpRequest.from(br);
+            HttpResponse httpResponse = new HttpResponse(dos);
 
-            // 헤더 읽기
-            Map<String, String> headers = IOUtils.readHeaders(br);
-            log.info("Headers: " + headers);
-
-            // 바디 읽기
-            String body = null;
-            if (headers.containsKey("Content-Length")) {
-                int contentLength = Integer.parseInt(headers.get("Content-Length"));
-                body = IOUtils.readData(br, contentLength);
-            }
-            log.info("Body: " + body);
-
-            if(requestLine != null)
-                handleRequest(requestLine, headers, body, dos);
+            //handleRequest(requestLine, headers, body, dos);
 
         } catch (IOException | URISyntaxException e) {
             log.log(Level.SEVERE,e.getMessage());
