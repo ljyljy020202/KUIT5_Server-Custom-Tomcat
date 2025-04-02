@@ -2,12 +2,14 @@ package webserver;
 
 import http.util.HttpRequestUtils;
 import http.util.HttpResponseUtils;
+import http.util.IOUtils;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,30 +29,37 @@ public class RequestHandler implements Runnable{
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             DataOutputStream dos = new DataOutputStream(out);
 
-            String line = br.readLine();
-            log.info("Request: " + line);
+            // 요청 메세지 읽기
+            String requestLine = br.readLine();
+            log.info("Request: " + requestLine);
 
-            if(line != null)
-                handleRequest(line, br, dos);
+            // 헤더 읽기
+            Map<String, String> headers = IOUtils.readHeaders(br);
+            log.info("Headers: " + headers);
 
-            /*
-            String line;
-            while ((line = br.readLine()) != null) {
-                log.info("Request: " + line);
-
-                if (!line.isEmpty()) { // 빈 줄이 아닐 때만 처리
-                    handleRequest(line, br, dos);
-                }
+            // 바디 읽기
+            String body = null;
+            if (headers.containsKey("Content-Length")) {
+                int contentLength = Integer.parseInt(headers.get("Content-Length"));
+                body = IOUtils.readData(br, contentLength);
             }
-            */
+            log.info("Body: " + body);
+
+            if(requestLine != null)
+                handleRequest(requestLine, headers, body, dos);
 
         } catch (IOException | URISyntaxException e) {
             log.log(Level.SEVERE,e.getMessage());
         }
     }
 
-    private void handleRequest(String line, BufferedReader br, DataOutputStream dos) throws IOException, URISyntaxException {
+    private void handleRequest(String line, Map<String, String> headers, String body, DataOutputStream dos) throws IOException, URISyntaxException {
         String[] tokens = line.split(" ");
+
+        boolean logined = false;
+        if(headers.containsKey("Cookie") && headers.get("Cookie").equals("logined=true"))
+            logined = true;
+
 
         if(tokens[0].equals("GET")) {
             URI uri = new URI(tokens[1]);
@@ -58,6 +67,12 @@ public class RequestHandler implements Runnable{
             String query = uri.getQuery();
 
             if(query == null) {
+
+                if(path.equals("/user/list.html") && !logined){
+                    HttpResponseUtils.response302Redirect(dos,"/user/login.html",false);
+                    return;
+                }
+
                 HttpResponseUtils.serveFile(dos, path);
             }else {
                 HashMap<String, String> map = (HashMap<String, String>) HttpRequestUtils.parseQueryParameter(query);
@@ -67,11 +82,10 @@ public class RequestHandler implements Runnable{
                     HandleLogIn.handle(dos, map);
                 }
             }
-
         }else if(tokens[0].equals("POST")) {
 
             if(tokens[1].equals("/user/signup")){
-                HandleSignUp.handlePost(dos);
+                HandleSignUp.handlePost(dos, body);
             }
         }
     }

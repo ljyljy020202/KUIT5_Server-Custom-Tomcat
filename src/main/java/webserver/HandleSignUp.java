@@ -1,12 +1,14 @@
 package webserver;
 
 import db.MemoryUserRepository;
+import http.util.HttpRequestUtils;
 import http.util.HttpResponseUtils;
 import model.User;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 public class HandleSignUp {
 
@@ -17,13 +19,18 @@ public class HandleSignUp {
         String email = map.get("email");
 
         User user = new User(userId, password, name, email);
-        MemoryUserRepository.getInstance().addUser(user);
-        System.out.println(userId+" 회원가입 완료");
-
-        HttpResponseUtils.response302Redirect(dos, "/index.html", false);
+        signUp(dos, user);
     }
 
-    public static void handlePost(DataOutputStream dos) throws IOException {
+    public static void handlePost(DataOutputStream dos, String body) throws IOException {
+        Map<String, String> map = HttpRequestUtils.parseQueryParameter(body);
+        handleGet(dos, (HashMap<String, String>) map);
+    }
 
+    private static void signUp(DataOutputStream dos, User user) throws IOException {
+        MemoryUserRepository.getInstance().addUser(user);
+        System.out.println(user.getUserId()+" 회원가입 완료");
+
+        HttpResponseUtils.response302Redirect(dos, "/index.html", false);
     }
 }

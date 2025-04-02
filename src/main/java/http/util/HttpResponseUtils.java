@@ -28,7 +28,7 @@ public class HttpResponseUtils {
             dos.writeBytes("HTTP/1.1 302 Found\r\n");
             dos.writeBytes("Location: " + redirectUrl + "\r\n");
             if(logined) {
-                dos.writeBytes("Cookie: logined=true\r\n");
+                dos.writeBytes("Set-Cookie: logined=true; Path=/; HttpOnly\r\n");
             }
             dos.writeBytes("\r\n");
         } catch (IOException e) {
