@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static enums.URL.INDEX_HTML;
+
 public class HandleSignUp {
 
     public static void handleGet(DataOutputStream dos, HashMap<String, String> map) throws IOException {
@@ -31,6 +33,6 @@ public class HandleSignUp {
         MemoryUserRepository.getInstance().addUser(user);
         System.out.println(user.getUserId()+" 회원가입 완료");
 
-        HttpResponseUtils.response302Redirect(dos, "/index.html", false);
+        HttpResponseUtils.response302Redirect(dos, INDEX_HTML.getUrl(), false);
     }
 }

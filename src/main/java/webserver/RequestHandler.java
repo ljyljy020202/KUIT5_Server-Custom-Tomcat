@@ -13,6 +13,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static enums.HttpMethod.GET;
+import static enums.HttpMethod.POST;
+import static enums.URL.*;
+
 public class RequestHandler implements Runnable{
     Socket connection;
     private static final Logger log = Logger.getLogger(RequestHandler.class.getName());
@@ -61,30 +65,31 @@ public class RequestHandler implements Runnable{
             logined = true;
 
 
-        if(tokens[0].equals("GET")) {
+        if(tokens[0].equals(GET.getMethod())) {
             URI uri = new URI(tokens[1]);
             String path = uri.getPath();
             String query = uri.getQuery();
 
-            if(query == null) {
+            if (query == null) {
 
-                if(path.equals("/user/list.html") && !logined){
-                    HttpResponseUtils.response302Redirect(dos,"/user/login.html",false);
+                if (path.equals(LIST_HTML.getUrl()) && !logined) {
+                    HttpResponseUtils.response302Redirect(dos, LOGIN_HTML.getUrl(), false);
                     return;
                 }
 
                 HttpResponseUtils.serveFile(dos, path);
-            }else {
+            } else {
                 HashMap<String, String> map = (HashMap<String, String>) HttpRequestUtils.parseQueryParameter(query);
-                if(path.equals("/user/signup")){
+                if (path.equals(SIGNUP.getUrl())) {
                     HandleSignUp.handleGet(dos, map);
-                }else if(path.equals("/user/login")){
+                } else if (path.equals(LOGIN.getUrl())) {
                     HandleLogIn.handle(dos, map);
                 }
             }
-        }else if(tokens[0].equals("POST")) {
+        }
+        if(tokens[0].equals(POST.getMethod())) {
 
-            if(tokens[1].equals("/user/signup")){
+            if(tokens[1].equals(SIGNUP.getUrl())) {
                 HandleSignUp.handlePost(dos, body);
             }
         }

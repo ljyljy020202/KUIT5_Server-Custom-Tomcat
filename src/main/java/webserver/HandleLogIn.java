@@ -8,6 +8,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
+import static enums.URL.INDEX_HTML;
+import static enums.URL.LOGIN_FAILED_HTML;
+
 public class HandleLogIn {
     public static void handle(DataOutputStream dos, HashMap<String, String> map) throws IOException {
         String userId = map.get("userId");
@@ -22,12 +25,12 @@ public class HandleLogIn {
     }
 
     private static void loginSuccess(DataOutputStream dos) throws IOException {
-        HttpResponseUtils.response302Redirect(dos,"/index.html", true);
+        HttpResponseUtils.response302Redirect(dos, INDEX_HTML.getUrl(), true);
         System.out.println("로그인 성공!");
     }
 
     private static void loginFailed(DataOutputStream dos) throws IOException {
-        HttpResponseUtils.response302Redirect(dos,"/user/login_failed.html", false);
+        HttpResponseUtils.response302Redirect(dos, LOGIN_FAILED_HTML.getUrl(), false);
         System.out.println("로그인 실패");
     }
 }

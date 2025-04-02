@@ -8,6 +8,9 @@ import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static enums.URL.INDEX_HTML;
+import static enums.URL.ROOT;
+
 public class HttpResponseUtils {
     private static final Logger log = Logger.getLogger(HttpResponseUtils.class.getName());
     private static final String WEB_ROOT = "webapp";
@@ -47,8 +50,8 @@ public class HttpResponseUtils {
 
     public static void serveFile(DataOutputStream dos, String filePath) {
         String contentType = "html";
-        if(filePath.equals("/")) {
-            filePath = "/index.html";
+        if(filePath.equals(ROOT.getUrl())) {
+            filePath = INDEX_HTML.getUrl();
         }
         if(filePath.endsWith("css")){
             contentType = "css";
