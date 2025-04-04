@@ -2,14 +2,11 @@ package controller;
 
 import db.MemoryUserRepository;
 import http.util.HttpRequestUtils;
-import http.util.HttpResponseUtils;
 import model.HttpRequest;
 import model.HttpResponse;
 import model.User;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import static enums.URL.INDEX_HTML;
@@ -27,7 +24,7 @@ public class LoginController implements Controller {
         loginFailed(httpResponse);
     }
 
-    public static boolean validUser(Map<String, String> map) throws IOException {
+    public static boolean validUser(Map<String, String> map) {
         String userId = map.get("userId");
         String password = map.get("password");
 
@@ -38,7 +35,7 @@ public class LoginController implements Controller {
         return false;
     }
 
-    private static void loginSuccess(HttpResponse httpResponse) throws IOException {
+    private static void loginSuccess(HttpResponse httpResponse) {
         httpResponse.response302Redirect(INDEX_HTML.getUrl(), true);
         System.out.println("로그인 성공!");
     }
