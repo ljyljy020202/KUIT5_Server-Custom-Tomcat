@@ -23,7 +23,7 @@ public class RequestMapper {
     }
 
     public void proceed() throws IOException {
-        String method = httpRequest.getMethod();
+        //String method = httpRequest.getMethod();
         URI uri = httpRequest.getURI();
         String path = uri.getPath();
 

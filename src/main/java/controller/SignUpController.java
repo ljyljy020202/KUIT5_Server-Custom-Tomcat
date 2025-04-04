@@ -19,18 +19,20 @@ public class SignUpController implements Controller {
     public void execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         Map<String, String> map = null;
         String method = httpRequest.getMethod();
+        String query = null;
+
         if(method.equals(GET.getMethod())) {
-            String query = httpRequest.getURI().getQuery();
-            map = HttpRequestUtils.parseQueryParameter(query);
+            query = httpRequest.getURI().getQuery();
         }
         if(method.equals(POST.getMethod())) {
-            String body = httpRequest.getBody();
-            map = HttpRequestUtils.parseQueryParameter(body);
+            query = httpRequest.getBody();
         }
+        map = HttpRequestUtils.parseQueryParameter(query);
+
         signUp(httpResponse, mapToUser(map));
     }
 
-    public static User mapToUser(Map<String, String> map) throws IOException {
+    public static User mapToUser(Map<String, String> map) {
         String userId = map.get(ID.getKey());
         String password = map.get(PW.getKey());
         String name = map.get(NAME.getKey());

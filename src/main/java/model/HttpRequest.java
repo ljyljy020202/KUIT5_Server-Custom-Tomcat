@@ -8,6 +8,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
+import static enums.HttpHeader.COOKIE;
+
 public class HttpRequest {
     private HttpRequestStartLine startLine;
     private Map<String, String> headers;
@@ -34,9 +36,6 @@ public class HttpRequest {
         return new HttpRequest(new HttpRequestStartLine(requestLine), headers, body);
     }
 
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
     public String getBody() {
         return body;
     }
@@ -46,11 +45,8 @@ public class HttpRequest {
     public URI getURI() {
         return startLine.getURI();
     }
-    public String getVersion() {
-        return startLine.getVersion();
-    }
     public boolean logined(){
-        if(headers.containsKey("Cookie") && headers.get("Cookie").equals("logined=true"))
+        if(headers.containsKey(COOKIE.getValue()) && headers.get(COOKIE.getValue()).equals("logined=true"))
             return true;
         return false;
     }

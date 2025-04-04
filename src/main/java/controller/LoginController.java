@@ -19,6 +19,7 @@ public class LoginController implements Controller {
     public void execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         String query = httpRequest.getURI().getQuery();
         Map<String, String> map = HttpRequestUtils.parseQueryParameter(query);
+
         if(validUser(map)){
             loginSuccess(httpResponse);
             return;

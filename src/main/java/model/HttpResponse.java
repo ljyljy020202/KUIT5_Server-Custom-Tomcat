@@ -20,7 +20,7 @@ public class HttpResponse {
 
     private HttpResponseStartLine startLine;
     private Map<String, String> headers;
-    private byte[] body;
+    private byte[] body = null;
 
     public HttpResponse(DataOutputStream dos) throws IOException {
         this.dos = dos;
@@ -28,6 +28,7 @@ public class HttpResponse {
 
     public void redirect(String redirectUrl, boolean logined) throws IOException {
         set302Header(redirectUrl, logined);
+        body = null;
         writeResponse();
     }
 
@@ -42,6 +43,7 @@ public class HttpResponse {
                 body = Files.readAllBytes(path);
                 set200Header(body.length, contentType);
             } else {
+                body = null;
                 set404Header();
             }
             writeResponse();
@@ -65,6 +67,7 @@ public class HttpResponse {
         if(logined) {
             header302.put(SET_COOKIE.getValue(), "logined=true; Path=/; HttpOnly");
         }
+        headers = header302;
     }
 
     private void set404Header() {
@@ -82,7 +85,9 @@ public class HttpResponse {
                 dos.writeBytes(header+": "+headers.get(header)+"\r\n");
             }
             dos.writeBytes("\r\n");
-            dos.write(body, 0, body.length);
+            if(body != null){
+                dos.write(body, 0, body.length);
+            }
             dos.flush();
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage());
