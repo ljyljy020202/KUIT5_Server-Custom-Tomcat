@@ -11,6 +11,8 @@ import java.util.Map;
 
 import static enums.URL.INDEX_HTML;
 import static enums.URL.LOGIN_FAILED_HTML;
+import static enums.UserKey.ID;
+import static enums.UserKey.PW;
 
 public class LoginController implements Controller {
     @Override
@@ -25,8 +27,8 @@ public class LoginController implements Controller {
     }
 
     public static boolean validUser(Map<String, String> map) {
-        String userId = map.get("userId");
-        String password = map.get("password");
+        String userId = map.get(ID.getKey());
+        String password = map.get(PW.getKey());
 
         User user = MemoryUserRepository.getInstance().findUserById(userId);
         if(user != null && user.getPassword().equals(password)) {
@@ -35,7 +37,7 @@ public class LoginController implements Controller {
         return false;
     }
 
-    private static void loginSuccess(HttpResponse httpResponse) {
+    private static void loginSuccess(HttpResponse httpResponse) throws IOException {
         httpResponse.redirect(INDEX_HTML.getUrl(), true);
         System.out.println("로그인 성공!");
     }

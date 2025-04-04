@@ -12,6 +12,7 @@ import java.util.Map;
 import static enums.HttpMethod.GET;
 import static enums.HttpMethod.POST;
 import static enums.URL.INDEX_HTML;
+import static enums.UserKey.*;
 
 public class SignUpController implements Controller {
     @Override
@@ -30,10 +31,10 @@ public class SignUpController implements Controller {
     }
 
     public static User mapToUser(Map<String, String> map) throws IOException {
-        String userId = map.get("userId");
-        String password = map.get("password");
-        String name = map.get("name");
-        String email = map.get("email");
+        String userId = map.get(ID.getKey());
+        String password = map.get(PW.getKey());
+        String name = map.get(NAME.getKey());
+        String email = map.get(EMAIL.getKey());
 
         User user = new User(userId, password, name, email);
         return user;

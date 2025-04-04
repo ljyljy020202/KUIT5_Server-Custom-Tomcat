@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static enums.HttpHeader.*;
 import static enums.StatusCode.*;
 
 public class HttpResponse {
@@ -52,25 +53,25 @@ public class HttpResponse {
     private void set200Header(int lengthOfBodyContent, String contentType) {
         startLine = new HttpResponseStartLine(OK);
         Map<String, String> header200 = new HashMap<>();
-        header200.put("Content-Type", "text/" + contentType + ";charset=utf-8");
-        header200.put("Content-Length", String.valueOf(lengthOfBodyContent));
+        header200.put(CONTENT_TYPE.getValue(), "text/" + contentType + ";charset=utf-8");
+        header200.put(CONTENT_LENGTH.getValue(), String.valueOf(lengthOfBodyContent));
         headers = header200;
     }
 
     private void set302Header(String redirectUrl, boolean logined) {
         startLine = new HttpResponseStartLine(FOUND);
         Map<String, String> header302 = new HashMap<>();
-        header302.put("Location", redirectUrl);
+        header302.put(LOCATION.getValue(), redirectUrl);
         if(logined) {
-            header302.put("Set-Cookie", "logined=true; Path=/; HttpOnly");
+            header302.put(SET_COOKIE.getValue(), "logined=true; Path=/; HttpOnly");
         }
     }
 
     private void set404Header() {
         startLine = new HttpResponseStartLine(NOT_FOUND);
         Map<String, String> header404 = new HashMap<>();
-        header404.put("Content-Type", "text/html;charset=utf-8");
-        header404.put("Content-Length", "0");
+        header404.put(CONTENT_TYPE.getValue(), "text/html;charset=utf-8");
+        header404.put(CONTENT_LENGTH.getValue(), "0");
         headers = header404;
     }
 
