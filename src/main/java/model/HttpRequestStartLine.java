@@ -3,12 +3,12 @@ package model;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class HttpStartLine {
+public class HttpRequestStartLine {
     private String method;
     private URI uri;
     private String version;
 
-    public HttpStartLine(String line) throws URISyntaxException {
+    public HttpRequestStartLine(String line) throws URISyntaxException {
         String[] tokens = line.split(" ");
 
         this.method = tokens[0];

@@ -9,11 +9,11 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 public class HttpRequest {
-    private HttpStartLine startLine;
+    private HttpRequestStartLine startLine;
     private Map<String, String> headers;
     private String body;
 
-    private HttpRequest(HttpStartLine startLine, Map<String, String> headers, String body) {
+    private HttpRequest(HttpRequestStartLine startLine, Map<String, String> headers, String body) {
         this.startLine = startLine;
         this.headers = headers;
         this.body = body;
@@ -31,7 +31,7 @@ public class HttpRequest {
             body = IOUtils.readData(br, contentLength);
         }
 
-        return new HttpRequest(new HttpStartLine(requestLine), headers, body);
+        return new HttpRequest(new HttpRequestStartLine(requestLine), headers, body);
     }
 
     public Map<String, String> getHeaders() {
@@ -48,5 +48,10 @@ public class HttpRequest {
     }
     public String getVersion() {
         return startLine.getVersion();
+    }
+    public boolean logined(){
+        if(headers.containsKey("Cookie") && headers.get("Cookie").equals("logined=true"))
+            return true;
+        return false;
     }
 }

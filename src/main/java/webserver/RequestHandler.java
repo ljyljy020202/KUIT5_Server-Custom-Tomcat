@@ -1,7 +1,6 @@
 package webserver;
 
-import http.util.HttpRequestUtils;
-import http.util.HttpResponseUtils;
+import controller.*;
 import model.HttpRequest;
 import model.HttpResponse;
 
@@ -9,18 +8,15 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static enums.HttpMethod.GET;
-import static enums.HttpMethod.POST;
-import static enums.URL.*;
 
 public class RequestHandler implements Runnable{
     Socket connection;
     private static final Logger log = Logger.getLogger(RequestHandler.class.getName());
+    private Controller controller = new ForwardController();
 
     public RequestHandler(Socket connection) {
         this.connection = connection;
@@ -37,48 +33,32 @@ public class RequestHandler implements Runnable{
             HttpRequest httpRequest = HttpRequest.from(br);
             HttpResponse httpResponse = new HttpResponse(dos);
 
-            //handleRequest(requestLine, headers, body, dos);
+            String method = httpRequest.getMethod();
+            URI uri = httpRequest.getURI();
+
+            // 요구 사항 1번
+            if (method.equals(GET.getMethod()) && uri.getPath().endsWith(".html")) {
+                controller = new ForwardController();
+            }
+            if (uri.getPath().equals("/")) {
+                controller = new HomeController();
+            }
+            // 요구 사항 2,3,4번
+            if (uri.getPath().equals("/user/signup")) {
+                controller = new SignUpController();
+            }
+            // 요구 사항 5번
+            if (uri.getPath().equals("/user/login")) {
+                controller = new LoginController();
+            }
+            // 요구 사항 6번
+            if (uri.getPath().equals("/user/userList")) {
+                controller = new ListController();
+            }
+            controller.execute(httpRequest, httpResponse);
 
         } catch (IOException | URISyntaxException e) {
             log.log(Level.SEVERE,e.getMessage());
-        }
-    }
-
-    private void handleRequest(String line, Map<String, String> headers, String body, DataOutputStream dos) throws IOException, URISyntaxException {
-        String[] tokens = line.split(" ");
-
-        boolean logined = false;
-        if(headers.containsKey("Cookie") && headers.get("Cookie").equals("logined=true"))
-            logined = true;
-
-
-        if(tokens[0].equals(GET.getMethod())) {
-            URI uri = new URI(tokens[1]);
-            String path = uri.getPath();
-            String query = uri.getQuery();
-
-            if (query == null) {
-
-                if (path.equals(LIST_HTML.getUrl()) && !logined) {
-                    HttpResponseUtils.response302Redirect(dos, LOGIN_HTML.getUrl(), false);
-                    return;
-                }
-
-                HttpResponseUtils.serveFile(dos, path);
-            } else {
-                HashMap<String, String> map = (HashMap<String, String>) HttpRequestUtils.parseQueryParameter(query);
-                if (path.equals(SIGNUP.getUrl())) {
-                    HandleSignUp.handleGet(dos, map);
-                } else if (path.equals(LOGIN.getUrl())) {
-                    HandleLogIn.handle(dos, map);
-                }
-            }
-        }
-        if(tokens[0].equals(POST.getMethod())) {
-
-            if(tokens[1].equals(SIGNUP.getUrl())) {
-                HandleSignUp.handlePost(dos, body);
-            }
         }
     }
 }
