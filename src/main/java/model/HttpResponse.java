@@ -1,22 +1,23 @@
 package model;
 
-import http.util.HttpResponseUtils;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static enums.StatusCode.*;
+
 public class HttpResponse {
-    private static final Logger log = Logger.getLogger(HttpResponseUtils.class.getName());
+    private static final Logger log = Logger.getLogger(HttpResponse.class.getName());
     private static final String WEB_ROOT = "webapp";
     private final DataOutputStream dos;
 
-    private HttpRequestStartLine startLine;
+    private HttpResponseStartLine startLine;
     private Map<String, String> headers;
     private byte[] body;
 
@@ -24,59 +25,66 @@ public class HttpResponse {
         this.dos = dos;
     }
 
-    public void response200Header(int lengthOfBodyContent, String contentType) throws IOException {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/" + contentType + ";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage());
-        }
-    }
-
-    public void response302Redirect(String redirectUrl, boolean logined) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 Found\r\n");
-            dos.writeBytes("Location: " + redirectUrl + "\r\n");
-            if(logined) {
-                dos.writeBytes("Set-Cookie: logined=true; Path=/; HttpOnly\r\n");
-            }
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage());
-        }
-    }
-
-    public void responseBody(byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage());
-        }
+    public void redirect(String redirectUrl, boolean logined) throws IOException {
+        set302Header(redirectUrl, logined);
+        writeResponse();
     }
 
     public void forward(String filePath){
         String contentType = "html";
-        if(filePath.endsWith("css")){
+        if(filePath.endsWith(".css")){
             contentType = "css";
         }
         try {
             Path path = Paths.get(WEB_ROOT, filePath);
             if (Files.exists(path) && !Files.isDirectory(path)) {
-                byte[] body = Files.readAllBytes(path);
-                response200Header(body.length, contentType);
-                responseBody(body);
-
+                body = Files.readAllBytes(path);
+                set200Header(body.length, contentType);
             } else {
-                //response404(dos);
+                set404Header();
             }
+            writeResponse();
         } catch (IOException e) {
             log.log(Level.SEVERE, "Error serving file: " + filePath, e);
         }
     }
-    private void writeData(){
 
+    private void set200Header(int lengthOfBodyContent, String contentType) {
+        startLine = new HttpResponseStartLine(OK);
+        Map<String, String> header200 = new HashMap<>();
+        header200.put("Content-Type", "text/" + contentType + ";charset=utf-8");
+        header200.put("Content-Length", String.valueOf(lengthOfBodyContent));
+        headers = header200;
+    }
+
+    private void set302Header(String redirectUrl, boolean logined) {
+        startLine = new HttpResponseStartLine(FOUND);
+        Map<String, String> header302 = new HashMap<>();
+        header302.put("Location", redirectUrl);
+        if(logined) {
+            header302.put("Set-Cookie", "logined=true; Path=/; HttpOnly");
+        }
+    }
+
+    private void set404Header() {
+        startLine = new HttpResponseStartLine(NOT_FOUND);
+        Map<String, String> header404 = new HashMap<>();
+        header404.put("Content-Type", "text/html;charset=utf-8");
+        header404.put("Content-Length", "0");
+        headers = header404;
+    }
+
+    private void writeResponse() throws IOException {
+        try {
+            dos.writeBytes( startLine+"\r\n");
+            for(String header: headers.keySet()){
+                dos.writeBytes(header+": "+headers.get(header)+"\r\n");
+            }
+            dos.writeBytes("\r\n");
+            dos.write(body, 0, body.length);
+            dos.flush();
+        } catch (IOException e) {
+            log.log(Level.SEVERE, e.getMessage());
+        }
     }
 }

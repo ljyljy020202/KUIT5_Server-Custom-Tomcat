@@ -1,6 +1,5 @@
 package webserver;
 
-import controller.*;
 import model.HttpRequest;
 import model.HttpResponse;
 
@@ -13,7 +12,6 @@ import java.util.logging.Logger;
 public class RequestHandler implements Runnable{
     Socket connection;
     private static final Logger log = Logger.getLogger(RequestHandler.class.getName());
-    private Controller controller = new ForwardController();
 
     public RequestHandler(Socket connection) {
         this.connection = connection;
@@ -21,7 +19,7 @@ public class RequestHandler implements Runnable{
 
     @Override
     public void run() {
-        //log.log(Level.INFO, "New Client Connect! Connected IP : " + connection.getInetAddress() + ", Port : " + connection.getPort());
+        log.log(Level.INFO, "New Client Connect! Connected IP : " + connection.getInetAddress() + ", Port : " + connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()){
             BufferedReader br = new BufferedReader(new InputStreamReader(in));

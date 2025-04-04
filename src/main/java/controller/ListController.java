@@ -12,6 +12,6 @@ public class ListController implements Controller {
             httpResponse.forward(LIST_HTML.getUrl());
             return;
         }
-        httpResponse.response302Redirect(LOGIN_HTML.getUrl(), false);
+        httpResponse.redirect(LOGIN_HTML.getUrl(), false);
     }
 }

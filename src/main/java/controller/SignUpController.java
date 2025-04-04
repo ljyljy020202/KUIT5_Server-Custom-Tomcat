@@ -17,11 +17,12 @@ public class SignUpController implements Controller {
     @Override
     public void execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         Map<String, String> map = null;
-        if(httpRequest.getMethod().equals(GET.getMethod())) {
+        String method = httpRequest.getMethod();
+        if(method.equals(GET.getMethod())) {
             String query = httpRequest.getURI().getQuery();
             map = HttpRequestUtils.parseQueryParameter(query);
         }
-        if(httpRequest.getMethod().equals(POST.getMethod())) {
+        if(method.equals(POST.getMethod())) {
             String body = httpRequest.getBody();
             map = HttpRequestUtils.parseQueryParameter(body);
         }
@@ -42,6 +43,6 @@ public class SignUpController implements Controller {
         MemoryUserRepository.getInstance().addUser(user);
         System.out.println(user.getUserId()+" 회원가입 완료");
 
-        httpResponse.response302Redirect(INDEX_HTML.getUrl(), false);
+        httpResponse.redirect(INDEX_HTML.getUrl(), false);
     }
 }

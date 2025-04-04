@@ -36,12 +36,12 @@ public class LoginController implements Controller {
     }
 
     private static void loginSuccess(HttpResponse httpResponse) {
-        httpResponse.response302Redirect(INDEX_HTML.getUrl(), true);
+        httpResponse.redirect(INDEX_HTML.getUrl(), true);
         System.out.println("로그인 성공!");
     }
 
     private static void loginFailed(HttpResponse httpResponse) throws IOException {
-        httpResponse.response302Redirect(LOGIN_FAILED_HTML.getUrl(), false);
+        httpResponse.redirect(LOGIN_FAILED_HTML.getUrl(), false);
         System.out.println("로그인 실패");
     }
 }
